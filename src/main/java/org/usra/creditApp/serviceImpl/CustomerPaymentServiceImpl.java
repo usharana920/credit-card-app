@@ -28,7 +28,7 @@ public class CustomerPaymentServiceImpl implements CustomerPaymentService {
         try {
             Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
             if (optionalCustomer.isEmpty()) {
-                throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+                throw CreditCoreException.asCreditCoreException(ExceptionCodes.CUSTOMER_NOT_FOUND);
             }
             Customer orgCustomer = optionalCustomer.get();
             // pay and update. should be transactional.

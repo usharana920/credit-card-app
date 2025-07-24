@@ -46,7 +46,7 @@ public class CreditCardServiceImpl implements CreditCardService {
             Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
             if (optionalCustomer.isEmpty()) {
                 log.error("Customer could not be found for id: {}", customerId);
-                throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+                throw CreditCoreException.asCreditCoreException(ExceptionCodes.CUSTOMER_NOT_FOUND);
             }
             Customer customer = optionalCustomer.get();
             customer.setCardStatus(CreditCardStatus.fromValue(customerStatusRequest.getCardStatus()));
@@ -78,7 +78,7 @@ public class CreditCardServiceImpl implements CreditCardService {
         try {
             Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
             if (optionalCustomer.isEmpty()) {
-                throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+                throw CreditCoreException.asCreditCoreException(ExceptionCodes.CUSTOMER_NOT_FOUND);
             }
             Customer orgCustomer = optionalCustomer.get();
             Customer updatedCustomer = updateCustomer(customerDetailsUpdateRequest, orgCustomer);

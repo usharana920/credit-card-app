@@ -14,11 +14,11 @@ public class CreditCoreException extends RuntimeException {
         this.errorDescription = errorDescription;
     }
 
-    public static CreditCoreException asBudgetException(ExceptionCodes exceptionCodes){
+    public static CreditCoreException asCreditCoreException(ExceptionCodes exceptionCodes){
         return new CreditCoreException(exceptionCodes.getCode(), exceptionCodes.getDescription());
     }
 
-    public static CreditCoreException asBudgetException(String errorCode, String errorDescription){
+    public static CreditCoreException asCreditCoreException(String errorCode, String errorDescription){
         return new CreditCoreException(errorCode, errorDescription);
     }
 }
