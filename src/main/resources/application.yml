@@ -1,0 +1,32 @@
+
+spring:
+  application:
+    name: credit-card-app
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EmailUsername}
+    password: ${EmailPassword}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.debug: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DBUrl}
+    username: ${DBUserName}
+    password: ${DBPassword}
+  jpa:
+    hibernate:
+      ddl-auto: update # When you launch the application for the first time - switch "none" at "create"
+    show-sql: false
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+
+server:
+  port: 8086
+
+logging:
+  level:
+    org.usra.creditApp: DEBUG
