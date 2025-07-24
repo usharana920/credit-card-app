@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 public enum CreditCardType {
 
     SAVINGS_360("SAVINGS_360"),
-    CHECKING("CHECKING"),
-    BROKERAGE("BROKERAGE"),
-    HEALTH_SAVINGS_ACCOUNT("HEALTH_SAVINGS_ACCOUNT");
+    REFLECT("REFLECT"),
+    CASH_REWARDS("CASH_REWARDS"),
+    TRAVEL_REWARDS("TRAVEL_REWARDS"),
+    STANDARD_CASH("STANDARD_CASH"),
+    PLATINUM("PLATINUM");
 
     private final String displayName;
 
