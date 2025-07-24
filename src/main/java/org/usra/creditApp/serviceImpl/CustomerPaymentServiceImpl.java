@@ -2,6 +2,7 @@ package org.usra.creditApp.serviceImpl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.usra.creditApp.dto.CustomerPaymentRequest;
 import org.usra.creditApp.enums.ExceptionCodes;
@@ -14,6 +15,7 @@ import org.usra.creditApp.service.CustomerPaymentService;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerPaymentServiceImpl implements CustomerPaymentService {
@@ -23,14 +25,22 @@ public class CustomerPaymentServiceImpl implements CustomerPaymentService {
 
     @Override
     public String processPayment(String customerId, CustomerPaymentRequest customerPaymentRequest) {
-        Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
-        if (optionalCustomer.isEmpty()){
-            throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+        try {
+            Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
+            if (optionalCustomer.isEmpty()) {
+                throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+            }
+            Customer orgCustomer = optionalCustomer.get();
+            // pay and update. should be transactional.
+            payAndUpdate(orgCustomer, customerPaymentRequest);
+            return "Done";
+        }catch (CreditCoreException e) {
+            log.error("Error updating card for customerId: {}", customerId);
+            return "Failed to update card. Customer not present. ";
+        } catch (Exception e) {
+            log.error("Unexpected error updating card for customerId {}: {}", customerId, e.getMessage());
+            return "An unexpected error occurred: " + e.getMessage();
         }
-        Customer orgCustomer = optionalCustomer.get();
-        // pay and update. should be transactional.
-        payAndUpdate(orgCustomer, customerPaymentRequest);
-        return "Done";
     }
 
     @Transactional

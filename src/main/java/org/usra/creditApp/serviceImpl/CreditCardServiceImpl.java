@@ -73,15 +73,23 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     @Transactional
     public String updateCustomerProfile(String customerId, CustomerDetailsUpdateRequest customerDetailsUpdateRequest) {
-        Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+        try {
+            Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
+            if (optionalCustomer.isEmpty()) {
+                throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+            }
+            Customer orgCustomer = optionalCustomer.get();
+            Customer updatedCustomer = updateCustomer(customerDetailsUpdateRequest, orgCustomer);
+            customerRepository.save(updatedCustomer);
+            log.debug("Customer profile updated for customer: {} and new customer profile: {}", customerId, updatedCustomer);
+            return "Success";
+        } catch (CreditCoreException e) {
+            log.error("Error updating card for customerId: {}", customerId);
+            return "Failed to update card. Customer not present. ";
+        } catch (Exception e) {
+            log.error("Unexpected error updating card for customerId {}: {}", customerId, e.getMessage());
+            return "An unexpected error occurred: " + e.getMessage();
         }
-        Customer orgCustomer = optionalCustomer.get();
-        Customer updatedCustomer = updateCustomer(customerDetailsUpdateRequest, orgCustomer);
-        customerRepository.save(updatedCustomer);
-        log.debug("Customer profile updated for customer: {} and new customer profile: {}", customerId, updatedCustomer);
-        return "Success";
     }
 
     private void saveCustomer(CustomerSignUpRequest customerSignUpRequest) {
