@@ -7,12 +7,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Generated;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.usra.creditApp.enums.CreditCardStatus;
+import org.usra.creditApp.enums.CreditCardType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "customer_details")
@@ -25,7 +25,7 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int customerId;
+    private int cId;
 
     private String firstName;
     private String lastName;
@@ -38,8 +38,16 @@ public class Customer {
     private double salary;
     private LocalDate dateOfBirth;
     private String socialSecurityNumber;
+    private double balance = 5000.0;
     @Enumerated(EnumType.STRING)
     private CreditCardStatus cardStatus;
+
+    @Enumerated(EnumType.STRING)
+    private CreditCardType creditCardType;
     @CreationTimestamp
     private LocalDateTime timestamp;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CustomerPaymentDetails> payments;
+
 }

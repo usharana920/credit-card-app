@@ -10,6 +10,7 @@ import org.usra.creditApp.dto.CustomerSignUpRequest;
 import org.usra.creditApp.dto.CustomerStatusRequest;
 import org.usra.creditApp.dto.EmailRequest;
 import org.usra.creditApp.enums.CreditCardStatus;
+import org.usra.creditApp.enums.CreditCardType;
 import org.usra.creditApp.enums.ExceptionCodes;
 import org.usra.creditApp.exception.CreditCoreException;
 import org.usra.creditApp.model.Customer;
@@ -19,8 +20,7 @@ import org.usra.creditApp.service.EmailService;
 
 import java.util.Optional;
 
-import static org.usra.creditApp.constants.Constants.CREDIT_CARD_APPLICATION;
-import static org.usra.creditApp.constants.Constants.CREDIT_CARD_REGISTRATION_RECEIVED_EMAIL_BODY;
+import static org.usra.creditApp.constants.Constants.*;
 
 @Slf4j
 @Service
@@ -31,31 +31,43 @@ public class CreditCardServiceImpl implements CreditCardService {
     private final EmailService emailService;
     private final ModelMapper modelMapper;
 
-    private void saveCustomer(CustomerSignUpRequest customerSignUpRequest) {
-        Customer customer = modelMapper.map(customerSignUpRequest, Customer.class);
-        customer.setCardStatus(CreditCardStatus.CARD_REQUEST_RECEIVED);
-        log.debug("Customer entity is: {}", customer);
-        customerRepository.save(customer);
-    }
-
     @Override
     public String processRegistration(CustomerSignUpRequest customerSignUpRequest) {
         saveCustomer(customerSignUpRequest);
-        emailService.processEmail(constructEmailRequest(customerSignUpRequest));
+        emailService.processEmail(constructRegistrationEmailRequest(customerSignUpRequest));
         return "Registration process completed.";
     }
 
     @Override
-    public String updateCard(String customerId, CustomerStatusRequest customerStatusRequest) {
-        Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
-        if (optionalCustomer.isEmpty()) {
-            throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+    public String updateCard(String customerId, CustomerStatusRequest customerStatusRequest){
+        try {
+            EmailRequest emailRequest = null;
+            Optional<Customer> optionalCustomer = customerRepository.findByCustomerId(customerId);
+            if (optionalCustomer.isEmpty()) {
+                log.error("Customer could not be found for id: {}", customerId);
+                throw CreditCoreException.asBudgetException(ExceptionCodes.CUSTOMER_NOT_FOUND);
+            }
+            Customer customer = optionalCustomer.get();
+            customer.setCardStatus(CreditCardStatus.fromValue(customerStatusRequest.getCardStatus()));
+            customerRepository.save(customer);
+            String email = customer.getEmail();
+
+            if (customerStatusRequest.getCardStatus() != null && customerStatusRequest.getCardStatus().equalsIgnoreCase("APPROVED")) {
+                emailRequest = constructCardApprovedEmailRequest(CustomerSignUpRequest.builder().email(email).build());
+            } else if (customerStatusRequest.getCardStatus() != null && customerStatusRequest.getCardStatus().equalsIgnoreCase("DENIED")) {
+                emailRequest = constructCardDeniedEmailRequest(CustomerSignUpRequest.builder().email(email).build());
+            }
+            emailService.processEmail(emailRequest);
+            log.debug("Card Status updated for customer: {}", customerId);
+            return "Success";
         }
-        Customer customer = optionalCustomer.get();
-        customer.setCardStatus(CreditCardStatus.fromValue(customerStatusRequest.getCardStatus()));
-        customerRepository.save(customer);
-        log.debug("Card Status updated for customer: {}", customerId);
-        return "Success";
+        catch (CreditCoreException e) {
+            log.error("Error updating card for customerId: {}", customerId);
+            return "Failed to update card. Customer not present. ";
+        } catch (Exception e) {
+            log.error("Unexpected error updating card for customerId {}: {}", customerId, e.getMessage());
+            return "An unexpected error occurred: " + e.getMessage();
+        }
     }
 
     @Override
@@ -72,6 +84,14 @@ public class CreditCardServiceImpl implements CreditCardService {
         return "Success";
     }
 
+    private void saveCustomer(CustomerSignUpRequest customerSignUpRequest) {
+        Customer customer = modelMapper.map(customerSignUpRequest, Customer.class);
+        customer.setCreditCardType(CreditCardType.fromValue(customerSignUpRequest.getCreditCardType()));
+        customer.setCardStatus(CreditCardStatus.CARD_REQUEST_RECEIVED);
+        log.debug("Customer entity is: {}", customer);
+        customerRepository.save(customer);
+    }
+
     private Customer updateCustomer(CustomerDetailsUpdateRequest customerDetailsUpdateRequest, Customer orgCustomer){
         if (customerDetailsUpdateRequest.getFirstName() != null) orgCustomer.setFirstName(customerDetailsUpdateRequest.getFirstName());
         if (customerDetailsUpdateRequest.getLastName() != null) orgCustomer.setLastName(customerDetailsUpdateRequest.getLastName());
@@ -85,9 +105,19 @@ public class CreditCardServiceImpl implements CreditCardService {
         return orgCustomer;
     }
 
-    private EmailRequest constructEmailRequest(CustomerSignUpRequest customerSignUpRequest){
-        return EmailRequest.builder().receiverEmail(customerSignUpRequest.getEmail()).emailPayload(CREDIT_CARD_REGISTRATION_RECEIVED_EMAIL_BODY).subject(CREDIT_CARD_APPLICATION)
+    private EmailRequest constructRegistrationEmailRequest(CustomerSignUpRequest customerSignUpRequest){
+        return EmailRequest.builder().receiverEmail(customerSignUpRequest.getEmail()).emailPayload(CREDIT_CARD_REGISTRATION_RECEIVED_EMAIL_BODY).subject(CREDIT_CARD_REGISTRATION_SUBJECT)
             .build();
+    }
+
+    private EmailRequest constructCardApprovedEmailRequest(CustomerSignUpRequest customerSignUpRequest){
+        return EmailRequest.builder().receiverEmail(customerSignUpRequest.getEmail()).emailPayload(CREDIT_CARD_APPROVED_EMAIL_BODY).subject(CREDIT_CARD_APPROVED_SUBJECT)
+                .build();
+    }
+
+    private EmailRequest constructCardDeniedEmailRequest(CustomerSignUpRequest customerSignUpRequest){
+        return EmailRequest.builder().receiverEmail(customerSignUpRequest.getEmail()).emailPayload(CREDIT_CARD_DENIED_EMAIL_BODY).subject(CREDIT_CARD_DENIED_SUBJECT)
+                .build();
     }
 
 }

@@ -16,9 +16,9 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
-    // sends email for success/ failure regsistration and credit card status.
     @Async
     public void processEmail(EmailRequest emailRequest) {
+        log.info("Sending Email to: {}. Status: {} ", emailRequest.getReceiverEmail(), emailRequest.getSubject() );
         sendEmail(emailRequest);
     }
 

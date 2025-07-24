@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
-    @Query("SELECT c from Customer c WHERE c.customerId = :customerId")
+    @Query("SELECT c from Customer c WHERE c.cId = :customerId")
     Optional<Customer> findByCustomerId(String customerId);
 }

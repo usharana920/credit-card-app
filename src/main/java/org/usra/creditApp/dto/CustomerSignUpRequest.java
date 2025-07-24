@@ -2,6 +2,7 @@ package org.usra.creditApp.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomerSignUpRequest {
     private String firstName;
@@ -25,6 +27,8 @@ public class CustomerSignUpRequest {
     private double salary;
     private LocalDate dateOfBirth;
     private String socialSecurityNumber;
+    private String creditCardType;
+//    private double balance;
     @CreationTimestamp
     private LocalDateTime timestamp;
 }
