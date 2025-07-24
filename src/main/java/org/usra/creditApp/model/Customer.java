@@ -46,6 +46,7 @@ public class Customer {
     private CreditCardType creditCardType;
     @CreationTimestamp
     private LocalDateTime timestamp;
+    private LocalDateTime accountOpenedDate;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomerPaymentDetails> payments;

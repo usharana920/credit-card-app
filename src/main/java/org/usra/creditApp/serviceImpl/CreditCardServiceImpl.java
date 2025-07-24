@@ -18,6 +18,7 @@ import org.usra.creditApp.repository.CustomerRepository;
 import org.usra.creditApp.service.CreditCardService;
 import org.usra.creditApp.service.EmailService;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.usra.creditApp.constants.Constants.*;
@@ -49,14 +50,15 @@ public class CreditCardServiceImpl implements CreditCardService {
             }
             Customer customer = optionalCustomer.get();
             customer.setCardStatus(CreditCardStatus.fromValue(customerStatusRequest.getCardStatus()));
-            customerRepository.save(customer);
             String email = customer.getEmail();
 
             if (customerStatusRequest.getCardStatus() != null && customerStatusRequest.getCardStatus().equalsIgnoreCase("APPROVED")) {
+                customer.setAccountOpenedDate(LocalDateTime.now());
                 emailRequest = constructCardApprovedEmailRequest(CustomerSignUpRequest.builder().email(email).build());
             } else if (customerStatusRequest.getCardStatus() != null && customerStatusRequest.getCardStatus().equalsIgnoreCase("DENIED")) {
                 emailRequest = constructCardDeniedEmailRequest(CustomerSignUpRequest.builder().email(email).build());
             }
+            customerRepository.save(customer);
             emailService.processEmail(emailRequest);
             log.debug("Card Status updated for customer: {}", customerId);
             return "Success";
