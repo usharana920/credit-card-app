@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "b2c61402-000e-41ab-96d6-dd789e9bdeb6",
+		"name": "credit-card-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34543874"
+	},
+	"item": [
+		{
+			"name": "customer registration",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    //   \"customerId\": 1001,\r\n    \"firstName\": \"Sam\",\r\n    \"lastName\": \"Test\",\r\n    \"email\": \"putYourEmailAddressToReceiveEmail@gmail.com\",\r\n    \"userName\": \"1245saytgyj\",\r\n    \"password\": \"sahu\",\r\n    \"phoneNumber\": \"7894561237\",\r\n    \"occupation\": \"Recruiter\",\r\n    \"salary\": 120000,\r\n    \"creditCardType\": \"CHECKING\",\r\n    //   \"balance\": 1200,\r\n    \"dateOfBirth\": \"1995-05-14\",\r\n    \"socialSecurityNumber\": \"123-45-6789\",\r\n    \"timestamp\": \"2024-07-22T16:05:23\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/customer/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"customer",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update card status",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    // \"cardStatus\": \"DENIED\"\r\n    // \"cardStatus\": \"UNDER_REVIEW\"\r\n    \"cardStatus\": \"APPROVED\"\r\n    // \"cardStatus\": \"DENIED\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/customer/update-card-status/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"customer",
+						"update-card-status",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update customer profile",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"lastName\": \"UNEVIEW\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/customer/update-customer-profile/203",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"customer",
+						"update-customer-profile",
+						"203"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "credit card payment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentAmount\": 100,\r\n    \"paymentSource\": \"BOA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/payments/pay/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"payments",
+						"pay",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
